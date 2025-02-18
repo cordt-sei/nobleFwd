@@ -1,0 +1,8 @@
+version: v1
+name: buf.build/noble/noblefwd
+deps:
+  - buf.build/noble/cosmos-sdk
+  - buf.build/cosmos/cosmos-sdk
+build:
+  module_mapping:
+    buf.build/cosmos/cosmos-sdk: buf.build/noble/cosmos-sdk

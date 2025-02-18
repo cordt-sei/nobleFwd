@@ -1,13 +1,27 @@
 {
-  "name": "nobleFwd",
+  "name": "noblefwd",
   "version": "1.0.0",
-  "type": "module",
+  "description": "Middleware for handling USDC CCTP flows through Noble",
   "main": "index.js",
+  "type": "module",
   "license": "MIT",
-	"scripts": {
-	  "start": "node scripts/server.js",
-  	  "generate": "bash generate.sh"
-	},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cordt-sei/nobleFwd.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cordt-sei/nobleFwd/issues"
+  },
+  "homepage": "https://github.com/cordt-sei/nobleFwd#readme",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node scripts/server.js",
+    "dev": "nodemon scripts/server.js",
+    "generate": "bash generate.sh",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
   "dependencies": {
     "@cosmjs/proto-signing": "^0.30.0",
     "@cosmjs/stargate": "^0.30.0",
@@ -15,5 +29,8 @@
     "@grpc/proto-loader": "^0.7.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2"
+  },
+  "resolutions": {
+    "protobufjs": "6.11.2"
   }
 }

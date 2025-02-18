@@ -1,8 +1,10 @@
+// server.js
+
 import express from 'express';
 import cluster from 'cluster';
 import os from 'os';
 import dotenv from 'dotenv';
-import { NobleForwarding } from './nobleForwarding.js';
+import { NobleForwarding } from '../src/nobleForwarding.js';
 
 dotenv.config();
 const app = express();
