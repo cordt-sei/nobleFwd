@@ -1,108 +1,156 @@
 # Noble Forwarding Middleware
 
-Provides a simple middleware / helper to support USDC CCTP flows through Noble without requiring users to manually interact with the Noble chain. General functions:
+Middleware for handling USDC CCTP flows through Noble without requiring individual users to sign messages or interact with the intermediary chain directly.
 
-- Query for an existing Noble forwarding account for a given hex address.
-- Automatically register a new forwarding account if one does not exist.
-- Sign and broadcast the registration transaction using Cosmos SDK tooling.
-- Cache known forwarding accounts to reduce on-chain queries.
+## Overview
 
-## Project Structure
+This middleware provides robust functionality to support USDC Cross-Chain Transfer Protocol (CCTP) flows through Noble:
 
-```
-.
-├── buf.gen.gogo.yaml         # Buf configuration for gogo code generation
-├── buf.gen.pulsar.yaml       # Buf configuration for pulsar code generation
-├── generate.sh               # Script to generate code from proto files
-├── proto                     # Protobuf definitions
-│   ├── account.proto
-│   ├── events.proto
-│   ├── genesis.proto
-│   ├── packet.proto
-│   ├── query.proto
-│   └── tx.proto
-└── scripts                   # Application scripts
-    ├── nobleForwarding.js   # The NobleForwarding library implementation
-    └── server.js            # Example Express server integration
-```
+- Query and automatically register Noble forwarding accounts for given hex addresses
+- Sign and broadcast registration transactions using Cosmos SDK tooling
+- High-performance caching with TTL and size limits
+- Built-in rate limiting and circuit breakers
+- Full metrics and monitoring support
 
-## Setup
+## Prerequisites
 
-### 1. Clone the Repository
+- Node.js 18+
+- npm or yarn
+- Docker (for local development)
+- Access to Noble chain RPC endpoints
+
+## Quick Start
+
+### Clone and Install
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/cordt-sei/nobleFwd.git
 cd noble-forwarding
+npm install
 ```
 
-### 2. Install Dependencies
+### Configure Environment
 
-Ensure you have [Node.js](https://nodejs.org/) installed, then run:
-
-```bash
-yarn install
-```
-
-### 3. Configure Environment Variables
-
-Create a `.env` file in the root directory with the following variables (adjust the values as needed):
+Create a `.env` file:
 
 ```env
+# Server Configuration
 PORT=3001
+NODE_ENV=production
+LOG_LEVEL=info
+
+# Noble Chain Configuration
 NOBLE_GRPC_ADDRESS=noble-grpc.example.com:443
 NOBLE_RPC_URL=https://rpc.noble-chain.com
 NOBLE_CHAIN_ID=noble-chain
 NOBLE_SIGNER_MNEMONIC="your mnemonic here"
 NOBLE_SIGNER_PREFIX=noble
+
+# Performance Configuration
+CACHE_TTL=3600
+CACHE_MAX_ITEMS=10000
+RATE_LIMIT_WINDOW_MS=60000
+RATE_LIMIT_MAX_REQUESTS=100
 ```
 
-### 4. Setup Protobuf Files
-
-- Place your `.proto` files under the `proto` directory.
-- The `buf.gen.gogo.yaml` and `buf.gen.pulsar.yaml` files provide configuration for code generation.  
-- Run the code generation script:
+### Generate Protocol Buffers
 
 ```bash
-yarn generate
+npm run generate
 ```
 
-This will use `generate.sh` to process your protobuf files. Adjust the generation script as needed to integrate with your desired code generators (e.g., gogo, pulsar).
-
-### 5. Integrate with Your Workflow
-
-- **Server Integration:**  
-  The `scripts/server.js` file contains an example Express server that uses the `NobleForwarding` library from `scripts/nobleForwarding.js`.  
-  You can integrate this library into your existing application by importing and using the `NobleForwarding` class:
-  
-  ```js
-  import { NobleForwarding } from './scripts/nobleForwarding.js';
-
-  const nobleForwarding = new NobleForwarding({
-    grpcAddress: process.env.NOBLE_GRPC_ADDRESS,
-    protoPath: './proto/query.proto', // Adjust this to your main proto file if needed
-    confirmationDelay: 5000
-  });
-
-  // Example usage:
-  const result = await nobleForwarding.ensureForwardingAccount("0xABC123...");
-  console.log(result);
-  ```
-  
-- **CCTP Flow:**  
-  In your CCTP flow, after processing the originating burn transaction on an EVM or Solana chain and obtaining the user’s hex address, call `ensureForwardingAccount()` to get or create a Noble forwarding account. Use the returned Noble address for subsequent CCTP burn transactions.
-
-## Running the Server
-
-To start the sample Express server, run:
+### Start Development Server
 
 ```bash
-npm start
+npm run dev
 ```
 
-You can then test the endpoint (e.g., via Postman or curl) by sending a POST request to `http://localhost:3001/process-forwarding` with a JSON payload like:
+## API Reference
+
+### Query Forwarding Account
+
+`GET /v1/accounts/:hexAddress`
+
+Returns Noble forwarding account for a given hex address.
+
+### Register Forwarding Account
+
+`POST /v1/accounts`
 
 ```json
 {
-  "hexAddress": "0xABC123..."
+  "hexAddress": "0xABC...",
+  "channel": "channel-0",  // Optional, defaults to "channel-39"
+  "fallback": ""          // Optional fallback address
 }
 ```
+
+### Health Check
+
+`GET /health`
+
+### Metrics
+
+`GET /metrics`
+
+## Error Handling
+
+The API uses standard HTTP status codes with detailed error responses:
+
+```json
+{
+  "error": {
+    "code": "INVALID_ADDRESS",
+    "message": "Invalid hex address format",
+    "details": {...}
+  }
+}
+```
+
+## Security Best Practices
+
+### Mnemonic Security
+
+- Use secure secret management
+- Rotate mnemonics regularly
+
+### Network Security
+
+- Enable TLS for all connections
+- Configure proper rate limits
+
+## Development
+
+```bash
+# Run tests
+yarn test         # Unit tests
+yarn test:int
+
+# Generate protos
+npm run generate
+
+# Start development server
+npm run dev
+```
+
+## Project Structure
+
+```shell
+.
+├── src/
+│   ├── lib/           # Core library implementation
+│   ├── proto/         # Protobuf definitions
+│   ├── server/        # API Server
+│   └── config/        # Configuration
+├── scripts/           # Utility scripts
+├── test/             # Test suite
+└── docker/           # Docker configuration
+```
+
+## License
+
+MIT License - see LICENSE.md
+
+## Contributing
+
+See CONTRIBUTING.md for guidelines.
