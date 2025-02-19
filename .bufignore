@@ -1,0 +1,6 @@
+# Ignore everything except proto files
+*
+!*.proto
+!buf.yaml
+!buf.gen.yaml
+!buf.lock
