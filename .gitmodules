@@ -1,0 +1,6 @@
+[submodule "proto/vendor/cctp"]
+	path = proto/vendor/cctp
+	url = https://github.com/circlefin/noble-cctp.git
+[submodule "proto/vendor/forwarding"]
+	path = proto/vendor/forwarding
+	url = https://github.com/noble-assets/forwarding.git
