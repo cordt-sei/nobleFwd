@@ -1,6 +1,6 @@
 {
   "name": "noblefwd",
-  "version": "1.0.0",
+  "version": "1.10.0",
   "description": "Middleware for handling USDC CCTP flows through Noble",
   "main": "index.js",
   "type": "module",
